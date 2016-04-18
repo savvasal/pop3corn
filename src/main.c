@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
     available_thread_id = getAvailableThread(threads_number, thread_info_array);
     if(available_thread_id != -1) {
       thread_info_array[available_thread_id].socket = new_socket_fd;
-      thread_info_array[available_thread_id].status = RUNNING;
+      thread_info_array[available_thread_id].status = new_socket_fd;
       pthread_kill(thread_id[available_thread_id], SIGALRM);
     }
     
@@ -221,38 +221,39 @@ void *runner(void *parameters){
   
   while (true) {
     printf("Hello world. I'm thread number %u and ready to serve any client.\n",(unsigned int) pthread_self());
-    pause();
-    if (my_info->status == RUNNING) {
-      
-      //  READ command from the client and print it
-      bzero(buffer, sizeof buffer); /* Initialize buffer */
-      if (read(my_info->socket, buffer, sizeof buffer) < 0) { /* Receive message */
-	perror("read");
-	exit(1);
-      }
-      printf("Read string: %s\n", buffer);
+    my_info->status = WAITING;
+    if(my_info->status != RUNNING)
+      pause();
+    my_info->status = RUNNING;
     
-      // read message from client
-      // ret_val = respond_to_command(buf); /* Reverse message */
-  
-      bzero(buffer, sizeof buffer);
-      sprintf(buffer, "Welcome");
-      if (write(my_info->socket, buffer, sizeof buffer) < 0) { /* Send message */
-	perror("write");
-	exit(1);
-      }
-  
-      my_info->status = WAITING;
-    
+    //  READ command from the client and print it
+    bzero(buffer, sizeof buffer); /* Initialize buffer */
+    if (read(my_info->socket, buffer, sizeof buffer) < 0) { /* Receive message */
+      perror("read");
+      exit(1);
     }
+    printf("Read string: %s\n", buffer);
+    
+    // read message from client
+    // ret_val = respond_to_command(buf); /* Reverse message */
+  
+    bzero(buffer, sizeof buffer);
+    sprintf(buffer, "Welcome");
+    if (write(my_info->socket, buffer, sizeof buffer) < 0) { /* Send message */
+      perror("write");
+      exit(1);
+    }
+  
+    my_info->status = WAITING;
+    
   }
+  
   
 }
 
 
 void sighand(int signo) {
 
-  
 }
 
 
