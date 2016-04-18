@@ -12,6 +12,8 @@
 
 // general constants
 #define MAX_STRING 128
+#define true 1
+#define MAX_BUFFER 128
 
 // STATE Constant values 
 #define AUTHORIZATION 0 
@@ -23,14 +25,18 @@
 #define RUNNING 1 
 #define WAITING 0 
 
+typedef struct {
+  int status;
+  int socket;
+} ThreadInfo;
 
-void *runner();
+void *runner(void *parameters);
 
 int main(int argc, char *argv[]) {
   
   // general usage variables
   char temp_string[MAX_STRING];
-  int i = 0;
+  int i = 0, err=0;
   
   // variables for reading configuration file
   FILE *config_file = NULL, *users_file = NULL;
@@ -45,9 +51,11 @@ int main(int argc, char *argv[]) {
   
 
   // auxiliary threads array
-  int *thread_status_array = NULL, *thread_socket_array = NULL;
+  ThreadInfo *thread_info_array = NULL;
 
-    
+  // array for threads
+  pthread_t *thread_id = NULL;
+  
   // int port, sock, newsock, serverlen, i; 
   // socklen_t clientlen; 
   // char buf[256]; 
@@ -125,30 +133,70 @@ int main(int argc, char *argv[]) {
     }
   
   // INITIALIZE common arrays for threads
-  thread_status_array = (int *) malloc(threads_number * sizeof(int));
-  if(!thread_status_array) {
-    perror("not enough space");
+
+  thread_info_array = (ThreadInfo *) malloc (threads_number * sizeof(ThreadInfo)); 
+    if(!thread_info_array) {
+    perror("not enough memory for thread info array");
     exit(1);
   } 
     
-  thread_socket_array = (int *) malloc(threads_number * sizeof(int));
-  if(!thread_socket_array) {
-    perror("not enough space");
-    free(thread_status_array);
-    exit(1);
+  thread_id = (pthread_t *) malloc(threads_number * sizeof(pthread_t));
+  if(!thread_id) {
+    perror("not enough memory for threads allocation");
+    free(thread_info_array);
+    exit(1);    
   }
 
   for(i=0; i < threads_number; i++) {
-    thread_status_array[i] = WAITING;
-    thread_socket_array[i] = -1;
+    thread_info_array[i].status = WAITING;
+    thread_info_array[i].socket = -1;
   }
 
+  for (i=0; i<threads_number; i++) {
+    err = (pthread_create(&thread_id[i], NULL, &runner,(void *) &thread_info_array[i]));
+    if (err) {
+      perror2("pthread_create", err);
+      exit(1);
+    }
+  }
+
+
+  
   
   // close files - free memory
   // TODO clean up in case of exit earlier
   // TODO check for every exit above
-  free(thread_status_array);
-  free(thread_socket_array);
+  free(thread_info_array);
   fclose(users_file);
 }
 
+void *runner(void *parameters){
+  char buffer[MAX_BUFFER]; //, return_value[MAX_STRING];
+  ThreadInfo *my_info = (ThreadInfo *) parameters;
+  
+  while (true) {
+    if (my_info->status == RUNNING) {
+      
+      // READ command from the client and print it
+      bzero(buffer, sizeof buffer); /* Initialize buffer */
+      if (read(my_info->socket, buffer, sizeof buffer) < 0) { /* Receive message */
+	perror("read");
+	exit(1);
+      }
+      printf("Read string: %s\n", buffer);
+      
+      // read message from client
+      // ret_val = respond_to_command(buf); /* Reverse message */
+      
+      bzero(buffer, sizeof buffer);
+      sprintf(buffer, "Welcome");
+      if (write(my_info->socket, buffer, sizeof buffer) < 0) { /* Send message */
+	perror("write");
+	exit(1);
+      }
+
+      my_info->status = WAITING;
+    
+    }
+  }
+} 
