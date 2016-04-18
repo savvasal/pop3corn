@@ -1,2 +1,10 @@
-playground
+# ignore the build and lib dirs
+build
+lib/*
+
+# ignore any executables
+bin/*
+
+
 *~
+#*

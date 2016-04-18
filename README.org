@@ -1,0 +1,13 @@
+* COMPILE
+* RUN
+* CONFIGURATION FILE
+  Configuration file should have a specific structure as below.
+  - LN1: threads <number of threads>
+  - LN2: port <number of port>
+  - LN3: users <users file name>
+* USERS FILE
+  Users file should have a specific structure as below.
+  - LN1: <user_1> <password_1>
+  - LN2: <user_2> <password_2>
+  - LNN: <user_n> <password_n>
+  
