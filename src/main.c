@@ -24,10 +24,10 @@
 #define WAITING 0 
 
 
-//void *runner();
+void *runner();
 
-int main(int argc, char *argv[]) /* Server with Internet stream sockets */ 
-{
+int main(int argc, char *argv[]) {
+  
   // general usage variables
   char temp_string[MAX_STRING];
   int i = 0;
