@@ -8,11 +8,12 @@
 #include <stdlib.h> 
 #include <string.h> 
 #include <pthread.h> 
-
+#include <signal.h>
 
 // general constants
 #define MAX_STRING 128
 #define true 1
+#define false 0
 #define MAX_BUFFER 128
 
 // STATE Constant values 
@@ -32,11 +33,18 @@ typedef struct {
 
 void *runner(void *parameters);
 
+
+// PARAMETERS: number of threads, array of threads' info
+// RETURN: id of available thread, otherwhise -1
+int getAvailableThread(int threads_number, ThreadInfo *thread_info_array);
+
+//void signalCallbackHandler(int signum, int *stop_flag);
+
 int main(int argc, char *argv[]) {
   
   // general usage variables
   char temp_string[MAX_STRING];
-  int i = 0, err=0;
+  int i = 0, err=0, available_thread_id = -1;
   
   // variables for reading configuration file
   FILE *config_file = NULL, *users_file = NULL;
@@ -45,9 +53,10 @@ int main(int argc, char *argv[]) {
 
 
   // sockets and server variables
-  int socket_fd = -1, server_sockaddr_len = 0;
-  struct sockaddr_in server_sockaddr; 
-  struct sockaddr *server_sockaddr_ptr;
+  int socket_fd = -1, new_socket_fd = -1;
+  unsigned int server_sockaddr_len = 0, client_sockaddr_len = 0;
+  struct sockaddr_in server_sockaddr, client_sockaddr; 
+  struct sockaddr *server_sockaddr_ptr, *client_sockaddr_ptr;
   
 
   // auxiliary threads array
@@ -55,14 +64,17 @@ int main(int argc, char *argv[]) {
 
   // array for threads
   pthread_t *thread_id = NULL;
-  
+
+  // signal handlers
+  // int *stop_flag = false;
+  // signal(SIGINT, signalCallbackHandler);
   // int port, sock, newsock, serverlen, i; 
   // socklen_t clientlen; 
   // char buf[256]; 
   // struct sockaddr *serverptr, *clientptr;
   //    struct sockaddr_in server,clint; 
 
-  // struct hostent *rem; 
+  struct hostent *rem; 
   // pthread_t tid[THREADS]; //threads table 
   // int thread_status[THREADS]; 
   // int socket_to_client[THREADS]; 
@@ -131,8 +143,10 @@ int main(int argc, char *argv[]) {
       perror("listen");
       exit(1);
     }
-  
-  // INITIALIZE common arrays for threads
+
+  printf("Listening for connections to port %d\n", port_number);
+
+  // INITIALIZE and malloc threads info array
 
   thread_info_array = (ThreadInfo *) malloc (threads_number * sizeof(ThreadInfo)); 
     if(!thread_info_array) {
@@ -146,12 +160,14 @@ int main(int argc, char *argv[]) {
     free(thread_info_array);
     exit(1);    
   }
-
+  
   for(i=0; i < threads_number; i++) {
     thread_info_array[i].status = WAITING;
     thread_info_array[i].socket = -1;
   }
 
+  // CREATE threads
+  
   for (i=0; i<threads_number; i++) {
     err = (pthread_create(&thread_id[i], NULL, &runner,(void *) &thread_info_array[i]));
     if (err) {
@@ -160,7 +176,33 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // listener
+  do {
+    
+    client_sockaddr_ptr = (struct sockaddr *) &client_sockaddr;
+    client_sockaddr_len = (socklen_t) sizeof client_sockaddr;
+    if ((new_socket_fd = accept(socket_fd, client_sockaddr_ptr, &client_sockaddr_len)) < 0)
+      {
+	perror("accept");
+	exit(1);
+      } /* Accept connection */
+    
+    rem = gethostbyaddr((char *) &client_sockaddr.sin_addr.s_addr, sizeof client_sockaddr.sin_addr.s_addr, /* Find client's address */client_sockaddr.sin_family);
+    if (rem == NULL)
+      {
+	perror("gethostbyaddr");
+	exit(1);
+      }
+    printf("Accepted connection from %s\n", rem -> h_name);
 
+    available_thread_id = getAvailableThread(threads_number, thread_info_array);
+    if(available_thread_id != -1) {
+      thread_info_array[available_thread_id].socket = new_socket_fd;
+      thread_info_array[available_thread_id].status = RUNNING;
+    }
+    
+  } while(true); //ctrl+c or a signal
+  
   
   
   // close files - free memory
@@ -200,3 +242,20 @@ void *runner(void *parameters){
     }
   }
 } 
+
+int getAvailableThread(int threads_number, ThreadInfo *thread_info_array) {
+  int i = 0;
+  ThreadInfo *thread_info = (ThreadInfo *) thread_info_array;
+
+  for(i=0; i<threads_number; i++) {
+    if(thread_info[i].status == WAITING)
+      return i;
+  }
+  
+  return -1;
+}
+
+
+//void signalCallbackHandler(int signum, int *stop_flag) {
+//  *stop_flag = true;
+//}
