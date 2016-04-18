@@ -32,7 +32,7 @@ typedef struct {
 } ThreadInfo;
 
 void *runner(void *parameters);
-
+void sighand(int signo);
 
 // PARAMETERS: number of threads, array of threads' info
 // RETURN: id of available thread, otherwhise -1
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
   // INITIALIZE and malloc threads info array
 
   thread_info_array = (ThreadInfo *) malloc (threads_number * sizeof(ThreadInfo)); 
-    if(!thread_info_array) {
+  if(!thread_info_array) {
     perror("not enough memory for thread info array");
     exit(1);
   } 
@@ -199,6 +199,7 @@ int main(int argc, char *argv[]) {
     if(available_thread_id != -1) {
       thread_info_array[available_thread_id].socket = new_socket_fd;
       thread_info_array[available_thread_id].status = RUNNING;
+      pthread_kill(thread_id[available_thread_id], SIGALRM);
     }
     
   } while(true); //ctrl+c or a signal
@@ -216,32 +217,46 @@ void *runner(void *parameters){
   char buffer[MAX_BUFFER]; //, return_value[MAX_STRING];
   ThreadInfo *my_info = (ThreadInfo *) parameters;
   
+  signal(SIGALRM, sighand);
+  
   while (true) {
+    printf("Hello world. I'm thread number %u and ready to serve any client.\n",(unsigned int) pthread_self());
+    pause();
     if (my_info->status == RUNNING) {
       
-      // READ command from the client and print it
+      //  READ command from the client and print it
       bzero(buffer, sizeof buffer); /* Initialize buffer */
       if (read(my_info->socket, buffer, sizeof buffer) < 0) { /* Receive message */
 	perror("read");
 	exit(1);
       }
       printf("Read string: %s\n", buffer);
-      
+    
       // read message from client
       // ret_val = respond_to_command(buf); /* Reverse message */
-      
+  
       bzero(buffer, sizeof buffer);
       sprintf(buffer, "Welcome");
       if (write(my_info->socket, buffer, sizeof buffer) < 0) { /* Send message */
 	perror("write");
 	exit(1);
       }
-
+  
       my_info->status = WAITING;
     
     }
   }
-} 
+  
+}
+
+
+void sighand(int signo) {
+
+  
+}
+
+
+
 
 int getAvailableThread(int threads_number, ThreadInfo *thread_info_array) {
   int i = 0;
