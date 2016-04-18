@@ -1,0 +1,33 @@
+TESTS to be made - Test PROTOCOL
+
+- Pass
+AUTHENTICATION
+  > QUIT
+  > USER, QUIT
+  > USER, PASS (pass correct for specific user)
+  > USER, PASS (pass correct for specific user)
+TRANSACTION
+  > USER, PASS, QUIT (then UPDATE - sign off: delete files created etc)
+  > USER, PASS, STAT (check number of messages, size of mailbox)
+  > USER, PASS, LIST (check multiple line response - no messages in mailbox)
+  > USER, PASS, LIST (check multiple line response - many messages in mailbox)
+  > USER, PASS, LIST 1 (check data for the specific message, number of message, size in bytes)
+  > USER, PASS, RETR 1 (check size in bytes, message data)
+  > USER, PASS, DELE 1 (message 1 exists & is deleted)
+
+- Fail
+AUTHENTICATION
+  > PASS (without USER)
+  > USER, PASS (correct USER, invalid PASS - mismatch)
+  > LALA (invalid command)
+TRANSACTION
+  > USER, PASS, LALA (invalid command)
+  > USER, PASS, RETR (number of message must be given in RETR command)
+  > USER, PASS, DELE (number of message must be given in DELE command)
+  > USER, PASS, DELE 2 (no such message - message 2 does not exist)
+  > USER, PASS, DELE 1, LIST 1 (message is deleted)
+  > USER, PASS, DELE 1, RETR 1 (message is deleted)
+  > USER, PASS, DELE 1, DELE 1 (message is already deleted)
+
+
+- End
