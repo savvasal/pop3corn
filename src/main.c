@@ -3,6 +3,8 @@
 #include "pool.h"
 #include "client.h"
 
+int assign_client_to_thread(pool *pool_of_threads, int socket, int thread_id);
+
 int
 main(int argc, char *argv[]) {
 
@@ -13,10 +15,10 @@ main(int argc, char *argv[]) {
 
   int threads_number = 0, port_number = 0;
   int socket_fd = -1, new_socket_fd = -1;
-
+  int available_thread_id = -1;
+  
   pool pool_of_threads;
   
-  //, new_socket_fd = -1;  /* fd stands for file descriptor */
   
   /* CHECK server parameters */
   if(argc < 2) {
@@ -73,9 +75,13 @@ main(int argc, char *argv[]) {
     }
     
     printf("%d\n",(int) new_socket_fd);  
-    //    assign to a thread if is available otherwise - 
-    
-    
+
+    /* assign to a thread if is available otherwise -  */
+    if( (available_thread_id = get_available_thread(&pool_of_threads)) != ERROR)
+      assign_client_to_thread(&pool_of_threads, new_socket_fd, available_thread_id);
+    else
+      close_client_socket(new_socket_fd);
+      
   } while(true); //ctrl+c or a signal
   
   
@@ -85,3 +91,18 @@ main(int argc, char *argv[]) {
   return 0;
 }
 
+
+
+int
+assign_client_to_thread(pool *pool_of_threads, int socket, int thread_id) {
+
+  (pool_of_threads->threads[thread_id]).socket = socket;
+  (pool_of_threads->threads[thread_id]).status = RUNNING;  
+  pthread_kill(pool_of_threads->threads[thread_id].id, SIGALRM);
+
+  return ERROR;
+}
+
+
+
+  

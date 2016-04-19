@@ -7,5 +7,7 @@
 
 int accept_client(int server_socket);
 
+int close_client_socket(int socket);
+
 
 #endif

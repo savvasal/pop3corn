@@ -18,3 +18,10 @@ accept_client(int server_socket) {
   
   return client_socket_fd;
 }
+
+int
+close_client_socket(int socket) {
+
+  return shutdown(socket, SHUT_RDWR);
+    
+}

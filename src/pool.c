@@ -27,25 +27,14 @@ start_threads(pool *pool_of_threads) {
   return  SUCCEED;
 }
 
-/* int getAvailableThread(int threads_number, ThreadInfo *thread_info_array) { */
-/*   int i = 0; */
-/*   ThreadInfo *thread_info = (ThreadInfo *) thread_info_array; */
+int
+get_available_thread(pool *pool_of_threads) {
+  int i = 0;
 
-/*   for(i=0; i<threads_number; i++) { */
-/*     if(thread_info[i].status == WAITING) */
-/*       return i; */
-/*   } */
-  
-/*   return -1; */
-/* } */
+  for(i=0; i < pool_of_threads->number_of_threads; i++)
+    if((pool_of_threads->threads[i]).status == WAITING)
+      return i;
 
-/* int assignClientToThread() { */
+  return ERROR;
 
-  
-/*   available_thread_id = getAvailableThread(threads_number, thread_info_array); */
-/*   if(available_thread_id != -1) { */
-/*     thread_info_array[available_thread_id].socket = new_socket_fd; */
-/*     thread_info_array[available_thread_id].status = new_socket_fd; */
-/*     pthread_kill(thread_id[available_thread_id], SIGALRM); */
-/*   } */
-/* } */
+}

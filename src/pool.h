@@ -17,6 +17,8 @@ int new_pool_of_threads(pool *pool_of_threads, int number_of_threads, char *user
 
 int start_threads(pool *pool_of_threads);
 
+int get_available_thread(pool *pool_of_threads);
+
 /* int assign_thread_to_client(pool pool_of_threads); */
 
 #endif
