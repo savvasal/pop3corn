@@ -1,5 +1,6 @@
 #include "commons.h"
 #include "server.h"
+#include "pool.h"
 
 int
 main(int argc, char *argv[]) {
@@ -11,6 +12,9 @@ main(int argc, char *argv[]) {
 
   int threads_number = 0, port_number = 0;
   int socket_fd = -1;
+
+  pool pool_of_threads;
+  
   //, new_socket_fd = -1;  /* fd stands for file descriptor */
   
   /* CHECK server parameters */
@@ -42,32 +46,42 @@ main(int argc, char *argv[]) {
   }
   fclose(users_file);
 
-  
-  
+
+  /* start server and create socket */
   socket_fd = new_server_socket(port_number);
 
-  close_server_socket(socket_fd);
-  // dhmiourghse threads
+  /* create threads */
+  if( new_pool_of_threads(&pool_of_threads, threads_number, users_filename) == ERROR) {
+    perror("create pool of threads");
+    exit(1);
+  }
 
-  // ksekina threads
   
+  
+  /* start threads */
+  if( start_threads(&pool_of_threads) == ERROR ) {
+    perror("start threads");
+    exit(1);
+  }
+    
   
   // listener
-  //do {
-
-
+  //  do {
+    
+    
   // client new socket  =
-
+    
   // assign to a thread if is available otherwise - 
 
     
-  //} while(true); //ctrl+c or a signal
+  // } while(true); //ctrl+c or a signal
   
   
   
   // close files - free memory
   // TODO clean up in case of exit earlier
   // TODO check for every exit above
+  close_server_socket(socket_fd);
 
   return 0;
 }
