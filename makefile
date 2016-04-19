@@ -21,11 +21,11 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 clean:
 	@echo " Cleaning..."; 
-	@echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET); $(RM) *~
+	@echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET); $(RM) *~ src/*~
 
 # Tests
 tester:
-	$(CC) $(CFLAGS) -L/user/local/lib -o bin/util_test test/util_test.c bin/util.o -lcunit
+	$(CC) $(CFLAGS) -L/user/local/lib -o bin/tester test/util_test.c bin/util.o -lcunit
 
 
 
