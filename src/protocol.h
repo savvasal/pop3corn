@@ -2,6 +2,7 @@
 #define __PROTOCOL_H__
 
 #include "commons.h"
+#include "user.h"
 
 #define AUTHORIZATION 0
 #define TRANSACTION 1

@@ -12,7 +12,7 @@ new_protocol(protocol *current_protocol, char *users_filename) {
 }
 
 int
-respond_to_command(protocol *my_protocol, char *command, char *return_value) {
+respond_to_command(protocol *current_protocol, char *command, char *return_value) {
 
   char *save, *token;
   char temp_string[MAX_STRING];
@@ -20,26 +20,26 @@ respond_to_command(protocol *my_protocol, char *command, char *return_value) {
 
   // First time to be called for the specific request
   // Make state from UPDATE to AUTHORIZATION
-  if (my_protocol->state == UPDATE)
-    strcpy(my_protocol->state, AUTHORIZATION);
+  if (current_protocol->state == UPDATE)
+    current_protocol->state =  AUTHORIZATION;
 	
   if (token==NULL){ 
     strcpy(return_value,"-ERR Invalid Command");
     return ERROR;
 		
-  } else switch(my_protocol->state) {
+  } else switch(current_protocol->state) {
     case AUTHORIZATION:
       if (strcmp(token,"QUIT")==0) {
         // sign off
         // ...
-	sprintf(temp_string, "+OK %s POP3 server signing off", protocol->current_user.username);
+	sprintf(temp_string, "+OK %s POP3 server signing off", (current_protocol->current_user).username);
 	strcpy(return_value, temp_string);
         return QUIT;
    
       } else if (strcmp(token,"USER")==0){
         token = strtok_r(NULL, " ", &save);
         if (token==NULL){
-          protocol->current_user.username = NULL;
+          (current_protocol->current_user).username = NULL;
 	  strcpy(return_value,"-ERR username wasn't given");
           return ERROR;
 		  
@@ -66,7 +66,7 @@ respond_to_command(protocol *my_protocol, char *command, char *return_value) {
           // anoigw to mailbox
           // ...
           // Change state to TRANSACTION - AUTHORIZATION is over
-	  strcpy(my_protocol->state, TRANSACTION);
+	  strcpy(current_protocol->state, TRANSACTION);
 	  strcpy(return_value,"+OK maildrop locked and ready");
           return SUCCEED;
 		  
@@ -90,7 +90,7 @@ respond_to_command(protocol *my_protocol, char *command, char *return_value) {
 	  // quit thread
 	  // ...
 	  // Change state to UPDATE
-	  strcpy(my_protocol->state, UPDATE);
+	  current_protocol->state =  UPDATE;
 	  strcpy(return_value,"+OK Quit");
 	  return QUIT;
       
