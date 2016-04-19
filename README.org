@@ -1,12 +1,33 @@
-* COMPILE
-* RUN
-* CONFIGURATION FILE
+* CLONE LOCALLY
+  #+BEGIN_SRC bash
+git clone https://github.com/Savinos90/pop3corn.git
+  #+END_SRC
+* BUILD
+  #+BEGIN_SRC bash
+make
+  #+END_SRC
+* TEST
+  #+BEGIN_SRC bash
+make tester
+./bin/tester
+  #+END_SRC
+* SETUP CONFIGURATION FILES
+** CONFIGURATION FILE
   Configuration file should have a specific structure as below.
   - LN1: threads <number of threads>
   - LN2: port <number of port>
   - LN3: users <users file name>
-* USERS FILE
+** USERS FILE
   Users file should have a specific structure as below.
   - LN1: <user_1> <password_1>
   - LN2: <user_2> <password_2>
   - LNN: <user_n> <password_n>
+* RUN
+  #+BEGIN_SRC bash
+./bin/server <configuration file>
+  #+END_SRC
+* CLEAN
+  #+BEGIN_SRC bash
+make clean
+  #+END_SRC
+
