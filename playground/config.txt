@@ -1,3 +1,0 @@
-threads 40
-port 30000
-users playground/users.txt
