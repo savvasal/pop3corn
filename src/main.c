@@ -1,6 +1,7 @@
 #include "commons.h"
 #include "server.h"
 #include "pool.h"
+#include "client.h"
 
 int
 main(int argc, char *argv[]) {
@@ -11,7 +12,7 @@ main(int argc, char *argv[]) {
   char config_filename[MAX_STRING], users_filename[MAX_STRING];  
 
   int threads_number = 0, port_number = 0;
-  int socket_fd = -1;
+  int socket_fd = -1, new_socket_fd = -1;
 
   pool pool_of_threads;
   
@@ -56,31 +57,29 @@ main(int argc, char *argv[]) {
     exit(1);
   }
 
-  
-  
   /* start threads */
   if( start_threads(&pool_of_threads) == ERROR ) {
     perror("start threads");
     exit(1);
   }
     
-  
-  // listener
-  //  do {
-    
-    
-  // client new socket  =
-    
-  // assign to a thread if is available otherwise - 
+  do {
 
+    new_socket_fd = accept_client(socket_fd);
     
-  // } while(true); //ctrl+c or a signal
+    if( new_socket_fd  == ERROR ) {
+      perror("new socket");
+      exit(1);
+    }
+    
+    printf("%d\n",(int) new_socket_fd);  
+    //    assign to a thread if is available otherwise - 
+    
+    
+  } while(true); //ctrl+c or a signal
   
   
   
-  // close files - free memory
-  // TODO clean up in case of exit earlier
-  // TODO check for every exit above
   close_server_socket(socket_fd);
 
   return 0;
