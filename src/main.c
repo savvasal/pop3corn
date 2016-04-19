@@ -1,4 +1,5 @@
 #include "commons.h"
+#include "server.h"
 
 int
 main(int argc, char *argv[]) {
@@ -9,7 +10,8 @@ main(int argc, char *argv[]) {
   char config_filename[MAX_STRING], users_filename[MAX_STRING];  
 
   int threads_number = 0, port_number = 0;
-  // int socket_fd = -1, new_socket_fd = -1;  /* fd stands for file descriptor */
+  int socket_fd = -1;
+  //, new_socket_fd = -1;  /* fd stands for file descriptor */
   
   /* CHECK server parameters */
   if(argc < 2) {
@@ -21,7 +23,7 @@ main(int argc, char *argv[]) {
   strcpy(config_filename, argv[1]);
   config_file = fopen(config_filename, "r");
   if(!config_file) {
-    perror("Please give as argument a configuration file"); 
+    perror("please give a config file"); 
     exit(1); 
   }
   
@@ -35,14 +37,16 @@ main(int argc, char *argv[]) {
   /* Check if users filename exists and is readable */
   users_file = fopen(users_filename, "r");
   if(!users_file) {
-    perror("Please initialize a file with users and passwords");
+    perror("please give users filename");
     exit(1);
   }
   fclose(users_file);
 
+  
+  
+  socket_fd = new_server_socket(port_number);
 
-  // server socket =
-
+  close_server_socket(socket_fd);
   // dhmiourghse threads
 
   // ksekina threads

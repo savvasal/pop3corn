@@ -7,7 +7,7 @@ TARGET := bin/server
 SRCEXT := c
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -g -Wall
+CFLAGS := -g -Wall -L/usr/local/lib 
 LIB := -pthread # -lmongoclient -L lib -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt
 INC := -I include
 
@@ -25,8 +25,4 @@ clean:
 
 # Tests
 tester:
-	$(CC) $(CFLAGS) -L/user/local/lib -o bin/tester test/util_test.c bin/util.o -lcunit
-
-
-
-
+	$(CC) $(CFLAGS) -o bin/tester test/tester.c build/server.o -lcunit
