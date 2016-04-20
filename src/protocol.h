@@ -15,7 +15,7 @@ typedef struct {
 } protocol;
 
 
-int new_protocol();
+int new_protocol(protocol *current_protocol, char *users_filename);
 
 int respond_to_command(protocol *my_protocol, char *command, char *return_value);
 

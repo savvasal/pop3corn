@@ -13,7 +13,7 @@ typedef struct {
 
 
 /* take as argument number of threads and return pool */
-int new_pool_of_threads(pool *pool_of_threads, int number_of_threads, char *users_filename);
+int new_pool_of_threads(pool *pool_of_threads, int number_of_threads, char users_filename[]);
 
 int start_threads(pool *pool_of_threads);
 

@@ -12,6 +12,7 @@ make tester
 ./bin/tester
   #+END_SRC
 * Setup configuration files
+  Check /examples/
 ** Configuration file
   Configuration file should have a specific structure as below.
   - LN1: threads <number of threads>
@@ -19,6 +20,7 @@ make tester
   - LN3: users <users file name>
 ** Users file
   Users file should have a specific structure as below.
+  - LN0: <number of users>
   - LN1: <user_1> <password_1>
   - LN2: <user_2> <password_2>
   - LNN: <user_n> <password_n>

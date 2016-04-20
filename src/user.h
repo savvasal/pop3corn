@@ -1,6 +1,7 @@
 #ifndef __USER_H__
 #define __USER_H__
 
+#include "commons.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -11,7 +12,7 @@
 typedef struct {
   char username[MAX_USERNAME];
   char password[MAX_PASSWORD];
-  char *users_filename; 
+  char users_filename[MAX_STRING]; 
 } user;
 
 

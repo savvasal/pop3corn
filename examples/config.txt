@@ -1,0 +1,3 @@
+threads 5
+port 30004
+users playground/users.txt

@@ -12,7 +12,7 @@ main(int argc, char *argv[]) {
 
   FILE *config_file = NULL, *users_file = NULL;
   char config_filename[MAX_STRING], users_filename[MAX_STRING];  
-
+  
   int threads_number = 0, port_number = 0;
   int socket_fd = -1, new_socket_fd = -1;
   int available_thread_id = -1;
@@ -74,8 +74,6 @@ main(int argc, char *argv[]) {
       exit(1);
     }
     
-    printf("%d\n",(int) new_socket_fd);  
-
     /* assign to a thread if is available otherwise -  */
     if( (available_thread_id = get_available_thread(&pool_of_threads)) != ERROR)
       assign_client_to_thread(&pool_of_threads, new_socket_fd, available_thread_id);

@@ -2,6 +2,7 @@
 #define __THREAD_H__
 
 #include "commons.h"
+#include "protocol.h"
 #include <pthread.h>
 #include <signal.h>
 #include <unistd.h> 
@@ -15,7 +16,7 @@ typedef struct {
   int status;
   int socket;
   pthread_t id;
-  char *users_filename;
+  char users_filename[MAX_STRING];
 } thread;
 
 int start_thread(thread *current_thread);

@@ -1,7 +1,7 @@
 #include "pool.h"
 
 int 
-new_pool_of_threads(pool *pool_of_threads, int number_of_threads, char *users_filename) {
+new_pool_of_threads(pool *pool_of_threads, int number_of_threads, char users_filename[]) {
 
   int i;
   
@@ -11,7 +11,7 @@ new_pool_of_threads(pool *pool_of_threads, int number_of_threads, char *users_fi
   for(i=0; i < pool_of_threads->number_of_threads; i++) {
     pool_of_threads->threads[i].status = WAITING;
     pool_of_threads->threads[i].socket = -1;
-    pool_of_threads->threads[i].users_filename = users_filename;
+    strcpy(pool_of_threads->threads[i].users_filename, users_filename);
   }
 
   return SUCCEED;
